@@ -34,5 +34,10 @@ increment_extension.increment(tensor)
 print('after increment', tensor[:10])
 ```
 ## Notes
-	•	Make sure your PyTorch version is compatible with your CUDA installation.
-	•	If you encounter any issues with compilation, check your system’s CUDA setup and ensure all dependencies are correctly installed.
+
+- Ensure your PyTorch version is compatible with your CUDA installation.  
+- If you encounter any issues with compilation, check your system's CUDA setup and verify that all dependencies are correctly installed.  
+- If you are using a conda environment named `conda_env` and Python 3.11, make sure to add the following paths to your `includePath` (this is necessary to use `<torch/extension.h>`):  
+```bash
+/home/username/.conda/envs/conda_env/lib/python3.11/site-packages/torch/include
+/home/username/.conda/envs/conda_env/lib/python3.11/site-packages/torch/include/torch/csrc/api/include
