@@ -1,16 +1,23 @@
 # 100 Days of GPU Challenge
+*(Huge thanks to [Umar Jamil](https://github.com/hkproj/100-days-of-gpu) for organizing this challenge!)*
 
-### Day 1
+## Progress Log
+
+### **Day 1**
 - Learned the basic syntax of C++ and CUDA.
-- Implemented a kernel for increment.  
-  *(Later, I added some scripts to call this kernel from PyTorch.)*
-- Chapter 1 finished
+- Implemented a simple kernel for increment.
+  *(Later, I added scripts to call this kernel from PyTorch.)*
+- Completed **Chapter 1**.
 
-### Day 2
-- Implemented GPU and CPU versions of vector addition.  
-  *(Unfortunately, for simple tasks like this, the GPU version turned out to be slower. )*
-- Chapter 2 finished
+### **Day 2**
+- Implemented both GPU and CPU versions of vector addition.
+  *(Unfortunately, the GPU version was slower for this simple task.)*
+- Completed **Chapter 2**.
 
-### Day 3
-- Implemented colorToGreyscaleConversion
-- Read part of chapter 3. (on page 52 now... have some questions...)
+### **Day 3**
+- Implemented `colorToGreyscaleConversion`.
+- Started reading **Chapter 3** (currently on page 52, with some questions).
+
+### **Day 4**
+- Resolved questions from **Day 3**.
+- Implemented an **image blurring kernel**.
