@@ -26,6 +26,10 @@
 - Wrote simple example how to use `image_blur.cu`.
 - created helpers folder and some functions for future use.
 
-### **Day 5** (TODO's)
+### **Day 5**
 - Finish the chapter 3
 - Matrix Addition kernel
+
+### **Day 6**
+- start Chapter 4.
+- Matrix addition kernel by row and column
