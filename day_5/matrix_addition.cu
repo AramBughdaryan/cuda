@@ -31,18 +31,19 @@ int main(){
     printArray(h_arr2, n, n, "Array 1");
 
     checkCudaError(cudaMalloc((void**)&d_arr1, size), "Allocate memory for arr1");
-    checkCudaError(((void**)&d_arr2, size), "Allocate memory for arr2");
-    checkCudaError(((void**)&d_out, size), "Allocate memory for output arr");
+    checkCudaError(cudaMalloc((void**)&d_arr2, size), "Allocate memory for arr2");
+    checkCudaError(cudaMalloc((void**)&d_out, size), "Allocate memory for output arr");
 
-    checkCudaError(cudaMemcpy(d_arr1, h_arr1, size, cudaMemcpyHostToDevice));
-    cudaMemcpy(d_arr2, h_arr2, size, cudaMemcpyHostToDevice);
+    checkCudaError(cudaMemcpy(d_arr1, h_arr1, size, cudaMemcpyHostToDevice), "Copy array 1 from host to device");
+    checkCudaError(cudaMemcpy(d_arr2, h_arr2, size, cudaMemcpyHostToDevice), "Copy array 2 from host to device");
 
     dim3 blockSize(n, n);
     dim3 gridDim(ceil(n/blockSize.x), ceil(n/blockSize.y));
     matrixAdditionKernel<<<gridDim, blockSize>>>(d_out, d_arr1, d_arr2, n);
 
-    cudaMemcpy(h_out, d_out, size, cudaMemcpyDeviceToHost);
+    checkCudaError(cudaMemcpy(h_out, d_out, size, cudaMemcpyDeviceToHost), "Copy output array from device to host");
     printArray(h_out, n, n, "Output sum vector");
+
 
 
 }   
