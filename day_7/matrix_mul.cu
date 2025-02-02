@@ -10,6 +10,10 @@ __global__ void matrixMulKernel(float* M, float* N, float* P, int width){
     if ((Row < width) && (Col < width)){
         float Pvalue = 0;
         for (int i = 0; i < width; i++){
+            // Since here we access element of M and one element of N
+            // and we apply one addition and one multiplication.
+            // compute to global-memory-access ratio is 1. 
+            // But we need to increase this ratio!
             Pvalue += M[Row * width + i] * N[i * width + Col];
         }
         P[Row * width + Col] = Pvalue;

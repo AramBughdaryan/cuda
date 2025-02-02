@@ -37,3 +37,5 @@
 
 ### **Day 7**
 - Exercises 6-11 solved!(page 69)
+- Implement simple matrix multiplication kernel
+- Start Chapter 4. Until section 4.4
