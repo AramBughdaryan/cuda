@@ -3,6 +3,9 @@
 #include <cassert>
 #include "../helpers/cuda_helpers.h"
 
+// If debug print's are not needed uncomment this line
+#define DEBUG_PRINT
+
 void matrixMulVector(float* A, float* B, float* C, int N);
 
 __global__ void matrixMulVectorKernel(float* d_A, float* d_B, float* d_C, int N){
@@ -33,13 +36,15 @@ void matrixMulVector(float* A, float* B, float* C, int N){
 
     const int blockSize = 8;
     dim3 threadsPerBlock(blockSize);
-    dim3 gridDim((N + blockSize - 1)/ threadsPerBlock.x);
+    dim3 gridDim((N + blockSize - 1)/ blockSize);
     matrixMulVectorKernel<<<gridDim, threadsPerBlock>>>(d_A, d_B, d_C, N);
 
     checkCudaError(cudaMemcpy(A, d_A, sizeVector, cudaMemcpyDeviceToHost), "Copy A from device to Host");
-    printArray(B, N, N, "B");
-    printArray(C, N, 1, "C");
-    printArray(A, N, 1, "A");
+    #ifdef DEBUG_PRINT
+        printArray(B, N, N, "B");
+        printArray(C, N, 1, "C");
+        printArray(A, N, 1, "A");
+    #endif
     cudaFree(d_A); cudaFree(d_B); cudaFree(d_C);
 }
 
@@ -59,7 +64,9 @@ void testMatrixMulVector() {
                         };
 
     matrixMulVector(A, B, C, N);
-    printArray(expectedA, N, 1, "Expected A");
+    #ifdef DEBUG_PRINT
+        printArray(expectedA, N, 1, "Expected A");
+    #endif
 
     for (int i = 0; i < N; i++) {
         assert(fabs(A[i] - expectedA[i]) < 1e-4);

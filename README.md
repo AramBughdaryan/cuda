@@ -31,5 +31,9 @@
 - Matrix Addition kernel
 
 ### **Day 6**
-- start Chapter 4.
 - Matrix addition kernel by row and column
+- matrixMulVectorKernel 
+- Exercises 1-6 solved! (Page 68)
+
+### **Day 7**
+- Exercises 6-11 solved!(page 69)
