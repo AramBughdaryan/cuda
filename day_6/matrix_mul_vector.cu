@@ -6,11 +6,15 @@
 // If debug print's are not needed uncomment this line
 #define DEBUG_PRINT
 
+__device__ int numCalls = 0;
+
+
 void matrixMulVector(float* A, float* B, float* C, int N);
 
 __global__ void matrixMulVectorKernel(float* d_A, float* d_B, float* d_C, int N){
     const int idx = threadIdx.x + blockDim.x * blockIdx.x;
-
+    atomicAdd(&numCalls, 1);
+    
     if (idx < N){
         float el_sum = 0;
         for (int i = 0; i < N; i++){
@@ -24,6 +28,8 @@ __global__ void matrixMulVectorKernel(float* d_A, float* d_B, float* d_C, int N)
 void matrixMulVector(float* A, float* B, float* C, int N){
     size_t sizeB = N * N * sizeof(float);
     size_t sizeVector = N * sizeof(float);
+    int h_count;
+    
 
     float *d_A, *d_B, *d_C;
     
@@ -46,6 +52,11 @@ void matrixMulVector(float* A, float* B, float* C, int N){
         printArray(A, N, 1, "A");
     #endif
     cudaFree(d_A); cudaFree(d_B); cudaFree(d_C);
+
+    cudaMemcpyFromSymbol(&h_count, numCalls, sizeof(int), 0, cudaMemcpyDeviceToHost);
+
+    printf("Number of kernel calls: %d\n", h_count);
+
 }
 
 void testMatrixMulVector() {

@@ -39,3 +39,8 @@
 - Exercises 6-11 solved!(page 69)
 - Implement simple matrix multiplication kernel
 - Start Chapter 4. Until section 4.4
+
+### **Day 8**
+- Read section 4.4
+- add test for simple kernel from **day 7**
+- start implementation of **tiledMatrixMulKernel**
