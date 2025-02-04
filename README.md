@@ -44,3 +44,8 @@
 - Read section 4.4
 - add test for simple kernel from **day 7**
 - start implementation of **tiledMatrixMulKernel**
+
+### **Day 9**
+- Implemented and finally understood **tiledMatrixMulKernel**
+- Watched Lecture 5 on PMPP book from **https://www.youtube.com/watch?v=31ZyYkoClT4&list=PLRRuQYjFhpmubuwx-w8X964ofVkW1T8O4&index=5**
+- Some test to validate results.
