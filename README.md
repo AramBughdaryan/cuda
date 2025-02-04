@@ -49,3 +49,4 @@
 - Implemented and finally understood **tiledMatrixMulKernel**
 - Watched Lecture 5 on PMPP book from **https://www.youtube.com/watch?v=31ZyYkoClT4&list=PLRRuQYjFhpmubuwx-w8X964ofVkW1T8O4&index=5**
 - Some test to validate results.
+- Read section 4.5

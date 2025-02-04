@@ -23,10 +23,10 @@ __global__ void tiledMatrixMulKernel(float* d_M, float* d_N, float* d_P, int Wid
 
     // As we declare this variable as automatic it will be private for each thread!
     float Pvalue = 0;
-    for (int tile = 0; tile < Width / TILE_WIDTH; ++tile){
+    for (int phase = 0; phase < Width / TILE_WIDTH; ++phase){
         // Collaborative loading of d_M and d_N tiles into shared memory
-        Mds[ty][tx] = d_M[Row * Width + tile * TILE_WIDTH + tx];
-        Nds[ty][tx] = d_N[(tile * TILE_WIDTH + threadIdx.y) * Width + Col]; 
+        Mds[ty][tx] = d_M[Row * Width + phase * TILE_WIDTH + tx];
+        Nds[ty][tx] = d_N[(phase * TILE_WIDTH + threadIdx.y) * Width + Col]; 
         __syncthreads();
 
         for (int k =0; k < TILE_WIDTH; ++k){
