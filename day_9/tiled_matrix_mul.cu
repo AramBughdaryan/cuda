@@ -3,7 +3,7 @@
 #include <cassert>
 #include "../helpers/cuda_helpers.h"
 
-#define TILE_WIDTH 32
+#define TILE_WIDTH 8
 
 void initializeMatrices(float* A, float* B, int M, int K, int N);
 
@@ -40,8 +40,8 @@ __global__ void tiledMatrixMulKernel(float* d_M, float* d_N, float* d_P, int Wid
 }
 
 __global__ void simpleMatrixMulKernel(float* M, float* N, float* P, int width){
-    int Row = blockDim.x * blockIdx.x + threadIdx.x;
-    int Col = blockDim.y * blockIdx.y + threadIdx.y;
+    int Row = blockDim.y * blockIdx.y + threadIdx.y;
+    int Col = blockDim.x * blockIdx.x + threadIdx.x;
 
     if ((Row < width) && (Col < width)){
         float Pvalue = 0;
@@ -64,7 +64,7 @@ void initializeMatrices(float* A, float* B, int M, int K, int N) {
 }
 
 void testTiledMatrixMul() {
-    int size = 512;
+    int size = 16;
     int matrixSize = size * size * sizeof(float);
     float *h_M = (float*)malloc(matrixSize);
     float *h_N = (float*)malloc(matrixSize);
@@ -89,7 +89,7 @@ void testTiledMatrixMul() {
     cudaMemcpy(d_N, h_N, matrixSize, cudaMemcpyHostToDevice);
 
     dim3 dimBlock(TILE_WIDTH, TILE_WIDTH);
-    dim3 dimGrid(size / TILE_WIDTH, size / TILE_WIDTH);
+    dim3 dimGrid((size + TILE_WIDTH - 1) / TILE_WIDTH, (size + TILE_WIDTH - 1) / TILE_WIDTH);
 
     cudaEvent_t start, stop;
     float elapsedTime;
@@ -130,8 +130,8 @@ void testTiledMatrixMul() {
     // uncomment to print arrays
     // printArray(h_M, size, size, "Matrix M");
     // printArray(h_N, size, size, "Matrix N");
-    // printArray(h_P_1, size, size, "Matrix P_1 TILED");
-    // printArray(h_P_2, size, size, "Matrix P_2 NAIVE");
+    printArray(h_P_1, size, size, "Matrix P_1 TILED");
+    printArray(h_P_2, size, size, "Matrix P_2 NAIVE");
 
 
     for (int i = 0; i < size * size; i++) {
