@@ -3,7 +3,7 @@
 #include <cassert>
 #include "../helpers/cuda_helpers.h"
 
-#define TILE_WIDTH 32
+#define TILE_WIDTH 16
 
 void initializeMatrices(float* A, float* B, int M, int K, int N);
 
@@ -27,8 +27,20 @@ __global__ void tiledMatrixMulKernel(float* d_M, float* d_N, float* d_P, int Wid
     float Pvalue = 0;
     for (int phase = 0; phase < Width / TILE_WIDTH; ++phase){
         // Collaborative loading of d_M and d_N tiles into shared memory
-        Mds[ty][tx] = d_M[Row * Width + phase * TILE_WIDTH + tx];
-        Nds[ty][tx] = d_N[(phase * TILE_WIDTH + threadIdx.y) * Width + Col]; 
+        if (Row < Width && phase * TILE_WIDTH + tx < Col)
+        {
+            Mds[ty][tx] = d_M[Row * Width + phase * TILE_WIDTH + tx];
+        }
+        // else{
+        //     Mds[ty][tx] = 0.0f;
+        // }
+
+        if (Col < Width && phase * TILE_WIDTH + ty){
+            Nds[ty][tx] = d_N[(phase * TILE_WIDTH + ty) * Width + Col]; 
+        }
+        // else{
+        //     Nds[ty][tx] = 0.0f;
+        // }
         __syncthreads();
 
         for (int k =0; k < TILE_WIDTH; ++k){
@@ -36,7 +48,9 @@ __global__ void tiledMatrixMulKernel(float* d_M, float* d_N, float* d_P, int Wid
         }
         __syncthreads();
     }
-    d_P[Row * Width + Col] = Pvalue;
+    if (Row < Width && Col < Width){
+        d_P[Row * Width + Col] = Pvalue;
+    }
 }
 
 __global__ void simpleMatrixMulKernel(float* M, float* N, float* P, int width){
@@ -64,7 +78,7 @@ void initializeMatrices(float* A, float* B, int M, int K, int N) {
 }
 
 void testTiledMatrixMul() {
-    int size = 512;
+    int size = 3;
     int matrixSize = size * size * sizeof(float);
     float *h_M = (float*)malloc(matrixSize);
     float *h_N = (float*)malloc(matrixSize);
@@ -130,8 +144,8 @@ void testTiledMatrixMul() {
     // uncomment to print arrays
     // printArray(h_M, size, size, "Matrix M");
     // printArray(h_N, size, size, "Matrix N");
-    // printArray(h_P_1, size, size, "Matrix P_1 TILED");
-    // printArray(h_P_2, size, size, "Matrix P_2 NAIVE");
+    printArray(h_P_1, size, size, "Matrix P_1 TILED");
+    printArray(h_P_2, size, size, "Matrix P_2 NAIVE");
 
 
     for (int i = 0; i < size * size; i++) {
