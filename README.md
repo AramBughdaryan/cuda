@@ -54,3 +54,7 @@
 ### **Day 10**
 - Fixed **tiledMatrixMulKernel** to work with boundary conditions
 - Read section 4.6
+
+### **Day 11**
+- Finished Reading chapter 4 of PMPP book.
+- Exercises 1-7

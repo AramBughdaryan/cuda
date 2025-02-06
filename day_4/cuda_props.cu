@@ -20,6 +20,8 @@ int main(){
         std::cout<<"Max blocks per dimension y: "<<dev_prop.maxGridSize[1]<<'\n';
         std::cout<<"Max blocks per dimension z: "<<dev_prop.maxGridSize[2]<<'\n';
         std::cout<<"Warp size: "<<dev_prop.warpSize<<'\n';
+        std::cout<<"Shared memory per block: "<<dev_prop.sharedMemPerBlock<<'\n';
+
     }
 
 }

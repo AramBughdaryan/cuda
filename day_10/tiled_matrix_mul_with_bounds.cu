@@ -3,7 +3,7 @@
 #include <cassert>
 #include "../helpers/cuda_helpers.h"
 
-#define TILE_WIDTH 2
+#define TILE_WIDTH 16
 
 void initializeMatrices(float* A, float* B, int M, int K, int N);
 
@@ -78,7 +78,7 @@ void initializeMatrices(float* A, float* B, int M, int K, int N) {
 }
 
 void testTiledMatrixMul() {
-    int size = 3;
+    int size = 512;
     int matrixSize = size * size * sizeof(float);
     float *h_M = (float*)malloc(matrixSize);
     float *h_N = (float*)malloc(matrixSize);
@@ -143,14 +143,14 @@ void testTiledMatrixMul() {
     cudaMemcpy(h_P_2, d_P_2, matrixSize, cudaMemcpyDeviceToHost);
 
     // uncomment to print arrays
-    printArray(h_M, size, size, "Matrix M");
-    printArray(h_N, size, size, "Matrix N");
-    printArray(h_P_1, size, size, "Matrix P_1 TILED");
-    printArray(h_P_2, size, size, "Matrix P_2 NAIVE");
+    // printArray(h_M, size, size, "Matrix M");
+    // printArray(h_N, size, size, "Matrix N");
+    // printArray(h_P_1, size, size, "Matrix P_1 TILED");
+    // printArray(h_P_2, size, size, "Matrix P_2 NAIVE");
 
 
     for (int i = 0; i < size * size; i++) {
-        assert(fabs(h_P_1[i] - h_P_2[i]) < 1e-3);
+        assert(fabs(h_P_1[i] - h_P_2[i]) < 1e-4);
     }
 
     cudaFree(d_M);
