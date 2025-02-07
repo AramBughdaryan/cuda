@@ -5,10 +5,6 @@
 
 #define TILE_WIDTH 16
 
-void initializeMatrices(float* A, float* B, int M, int K, int N);
-
-
-
 // P = M * N
 __global__ void tiledMatrixMulKernel(float* d_M, float* d_N, float* d_P, int Width){
     __shared__ float Mds[TILE_WIDTH][TILE_WIDTH];
@@ -70,12 +66,6 @@ __global__ void simpleMatrixMulKernel(float* M, float* N, float* P, int width){
     }
 }
 
-
-
-void initializeMatrices(float* A, float* B, int M, int K, int N) {
-    for(int i = 0; i < M * K; i++) A[i] = rand() / (float)RAND_MAX;
-    for(int i = 0; i < K * N; i++) B[i] = rand() / (float)RAND_MAX;
-}
 
 void testTiledMatrixMul() {
     int size = 512;
