@@ -57,4 +57,8 @@
 
 ### **Day 11**
 - Finished Reading chapter 4 of PMPP book.
-- Exercises 1-7
+- Exercises 1-9
+
+### **Day 12**
+- Exercise 10 of chapter 4.
+

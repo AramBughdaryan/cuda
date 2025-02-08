@@ -1,3 +1,14 @@
+// To manipulate tiles, a new CUDA programmer has written the following
+// device kernel, which will transpose each tile in a matrix. The tiles are of
+// size BLOCK_WIDTH by BLOCK_WIDTH, and each of the dimensions of matrix A
+// is known to be a multiple of BLOCK_WIDTH. The kernel invocation and code
+// are shown below. BLOCK_WIDTH is known at compile time, but could be set
+// anywhere from 1 to 20.
+
+// Solution A.
+
+// will work only when BLOCK_WIDTH == BLOCK_SIZe
+
 #include <iostream>
 #include <cuda.h>
 #include "../helpers/cuda_helpers.h"
