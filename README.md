@@ -62,3 +62,8 @@
 ### **Day 12**
 - Exercise 10 of chapter 4.
 
+### **Day 13**
+- Read section 5.1 on Global Memoery Bandwidth
+- Learn about memory coalesced
+
+### **Day 14**
