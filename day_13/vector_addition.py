@@ -39,15 +39,34 @@ def add(x: torch.Tensor, y: torch.Tensor):
 
     return output
 
-if __name__ == '__main__':
-    torch.manual_seed(42)
-    size = 98432
+
+@triton.testing.perf_report(
+    triton.testing.Benchmark(
+        x_names=['size'],
+        x_vals=[2**i for i in range(12, 28, 1)],
+        x_log=True,
+        line_arg='provider',
+        line_vals=['triton', 'torch'],
+        line_names=['Triton', 'PyTorch'],
+        styles=[('blue', '-'), ('green', '-')],
+        ylabel='GB/s',
+        plot_name='vector-add-performance',
+        args={},
+    ))
+def benchmark(size, provider):
     x = torch.randn(size=(size, ), device=DEVICE)
     y = torch.randn(size=(size, ), device=DEVICE)
-    out_torch = x + y
-    out_triton = add(x, y)
-    print(out_torch, out_triton)
 
-    print(f"The maxmimum difference between torch and triton is ", 
-        f'{torch.max(torch.abs(out_torch - out_triton))}')
+    quantiles = [0.5, 0.2, 0.8]
+    if provider == 'torch':
+        ms, min_ms, max_ms = triton.testing.do_bench(lambda: x + y, quantiles=quantiles)
+    if provider == 'triton':
+        ms, min_ms, max_ms = triton.testing.do_bench(lambda: add(x, y), quantiles=quantiles)
+    gbps = lambda ms: 3 * x.numel() * x.element_size() * 1e-9 / (ms * 1e-3)
 
+    return gbps(ms), gbps(max_ms), gbps(min_ms)
+
+
+if __name__ == '__main__':
+    torch.manual_seed(42)
+    benchmark.run(print_data=True, show_plots=True, save_path='res')

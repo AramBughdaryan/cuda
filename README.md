@@ -65,5 +65,7 @@
 ### **Day 13**
 - Read section 5.1 on Global Memoery Bandwidth
 - Learn about memory coalesced
+- Come back with Triton. vector addition + benchmarking
 
 ### **Day 14**
+- Read section 5.2
