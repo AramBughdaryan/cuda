@@ -69,4 +69,4 @@ def benchmark(size, provider):
 
 if __name__ == '__main__':
     torch.manual_seed(42)
-    benchmark.run(print_data=True, show_plots=True, save_path='res')
+    benchmark.run(print_data=True, show_plots=True, save_path='.')
