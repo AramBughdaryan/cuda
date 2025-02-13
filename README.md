@@ -70,3 +70,7 @@
 ### **Day 14**
 - Read section 5.2
 - Fused softmax with Triton + Benchmarking with naive softmax and PyTorch's softmax
+
+### **Day 15**
+- Read part of section 5.3 till page 122
+- Write simple partialSum kernel
