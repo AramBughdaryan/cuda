@@ -16,6 +16,14 @@ WARP_SIZE = properties["warpSize"]
 target = triton.runtime.driver.active.get_current_target()
 kernels = {}
 
+print(f"NUM_SM: {NUM_SM}")
+print(f"NUM_REGS: {NUM_REGS}")
+print(f"SIZE_SMEM: {SIZE_SMEM}")
+print(f"WARP_SIZE: {WARP_SIZE}")
+print(f"target: {target}")
+
+
+
 def is_hip():
     return triton.runtime.driver.active.get_current_target().backend == 'hip'
 
@@ -127,9 +135,39 @@ def softmax(x):
     return y
 
 
+@triton.testing.perf_report(
+    triton.testing.Benchmark(
+        x_names=['N'],
+        x_vals=[128 * i for i in range (2, 100)],
+        line_arg='provider',
+        line_vals=['triton', 'torch', 'naive_softmax'],
+        line_names=['Triton', 'Torch', 'Naive Softmax'],
+        styles=[('blue', '-'), ('green', '-'), ('red', '-')],
+        ylabel='GB/s',
+        plot_name='Softmax-performance',
+        args={'M': 4096},
+    ))
+def benchmark(M, N, provider):
+    x = torch.randn(M, N, device=DEVICE, dtype=torch.float32)
+    stream = getattr(torch, DEVICE.type).Stream()
+    getattr(torch, DEVICE.type).set_stream(stream)
+    if provider == 'torch':
+        ms = triton.testing.do_bench(lambda: torch.softmax(x, axis=-1))
+    if provider == 'triton':
+        ms = triton.testing.do_bench(lambda: softmax(x))
+    if provider == 'naive_softmax':
+        ms = triton.testing.do_bench(lambda: naive_softmax(x))
+    
+    gbps = lambda ms: 2 * x.numel() * x.element_size() * 1e-9 / (ms * 1e-3)
+
+    return gbps(ms)
+
+
 if __name__ == "__main__":
     torch.manual_seed(0)
-    x = torch.randn(13, 781, device=DEVICE)
+    x = torch.randn(1513, 781, device=DEVICE)
     y_triton = softmax(x)
     y_torch = torch.softmax(x, axis=1)
     assert torch.allclose(y_triton, y_torch), (y_triton, y_torch)
+
+    benchmark.run(show_plots=True, print_data=True, save_path='results')
