@@ -69,3 +69,4 @@
 
 ### **Day 14**
 - Read section 5.2
+- Fused softmax with Triton + Benchmarking with naive softmax and PyTorch's softmax
