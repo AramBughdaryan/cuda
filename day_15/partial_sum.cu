@@ -62,8 +62,38 @@ void testPartialSumKernel() {
 
     cudaMemcpy(d_X, h_X, dataSize * sizeof(float), cudaMemcpyHostToDevice);
 
+    cudaEvent_t start, stop;
+    float elapsedTime;
+
+    // Measure time for partialSumKernel
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start, 0);
+
     partialSumKernel<<<numBlocks, numThreads>>>(d_X, d_Y);
+
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&elapsedTime, start, stop);
+    std::cout << "Time for partialSumKernel: " << elapsedTime << " ms" << std::endl;
+
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
+
+    // Measure time for optimisedPartialSumKernel
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+    cudaEventRecord(start, 0);
+
     optimisedPartialSumKernel<<<numBlocks, numThreads>>>(d_X, d_Y_optimised);
+
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&elapsedTime, start, stop);
+    std::cout << "Time for optimisedPartialSumKernel: " << elapsedTime << " ms" << std::endl;
+
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
 
     cudaMemcpy(h_Y, d_Y, numBlocks * sizeof(float), cudaMemcpyDeviceToHost);
     cudaMemcpy(h_Y_optimised, d_Y_optimised, numBlocks * sizeof(float), cudaMemcpyDeviceToHost);
