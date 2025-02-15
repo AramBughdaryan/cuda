@@ -77,3 +77,7 @@
 - Implement optimised partialSum (tensor size 1024) (With less thread divergence)
   - Time for partialSumKernel: 0.164544 ms
   - Time for optimisedPartialSumKernel: 0.019264 ms
+
+### **Day 16**
+- Finish chapter 5!
+- Starting exercises
