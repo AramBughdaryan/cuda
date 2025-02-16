@@ -81,3 +81,6 @@
 ### **Day 16**
 - Finish chapter 5!
 - Starting exercises
+
+### **Day 17**
+- Finish chapter 6!
