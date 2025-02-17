@@ -84,3 +84,6 @@
 
 ### **Day 17**
 - Finish chapter 6!
+
+### **Day 18**
+- Read section 7.1
