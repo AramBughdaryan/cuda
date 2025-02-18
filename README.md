@@ -87,3 +87,7 @@
 
 ### **Day 18**
 - Read section 7.1
+
+### **Day 19**
+- Read section 7.2
+- Implement 1D convolution kernel
