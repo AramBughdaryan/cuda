@@ -91,3 +91,8 @@
 ### **Day 19**
 - Read section 7.2
 - Implement 1D convolution kernel
+
+### **Day 20**
+- Read section 7.3
+- Implement 1D convolution kernel with usage of constant memory. (Optimised on speed around 4 times)
+

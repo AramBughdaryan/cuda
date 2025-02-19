@@ -4,11 +4,14 @@
 
 #include "../helpers/cuda_helpers.h"
 
-__global__ void convolution_1D_basic_kernel(float *N, float *M, float *P, int maskWidth, int Width){
+#define MAX_MASK_WIDTH 3
+__constant__ float M[MAX_MASK_WIDTH];
+
+__global__ void convolution_1D_basic_kernel(float *N, float *P, int Width){
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     float Pvalue = 0;
-    int N_start_point = i - (maskWidth/2);
-    for (int j = 0; j < maskWidth; j++){
+    int N_start_point = i - (MAX_MASK_WIDTH/2);
+    for (int j = 0; j < MAX_MASK_WIDTH; j++){
         if (N_start_point + j >= 0 && N_start_point + j < Width){
             Pvalue += N[N_start_point + j] * M[j];
         }
@@ -18,29 +21,26 @@ __global__ void convolution_1D_basic_kernel(float *N, float *M, float *P, int ma
 
 
 void test_convolution_1D_basic_kernel() {
-    int Width = 1024;
-    int maskWidth = 3;
-    
+    int Width = 512;
+
     float *h_N = (float*)malloc(Width * sizeof(float));
 
     initializeMatrix<float>(h_N, ceil(Width) / 4, 4);
     float h_M[3] = {0.5, 1.05, -1.2};
     float h_P[Width] = {0};
 
-
-    float *d_N, *d_M, *d_P;
+    float *d_N, *d_P;
     cudaMalloc(&d_N, Width * sizeof(float));
-    cudaMalloc(&d_M, maskWidth * sizeof(float));
     cudaMalloc(&d_P, Width * sizeof(float));
 
     cudaMemcpy(d_N, h_N, Width * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_M, h_M, maskWidth * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemcpyToSymbol(M, h_M, MAX_MASK_WIDTH * sizeof(float));
 
     int blockSize = 256;
     int numBlocks = (Width + blockSize - 1) / blockSize;
 
     auto start = std::chrono::high_resolution_clock::now();
-    convolution_1D_basic_kernel<<<numBlocks, blockSize>>>(d_N, d_M, d_P, maskWidth, Width);
+    convolution_1D_basic_kernel<<<numBlocks, blockSize>>>(d_N, d_P, Width);
     cudaDeviceSynchronize();
     auto end = std::chrono::high_resolution_clock::now();
 
@@ -56,7 +56,6 @@ void test_convolution_1D_basic_kernel() {
     std::cout << "Time taken: " << duration.count() << " ms" << std::endl;
 
     cudaFree(d_N);
-    cudaFree(d_M);
     cudaFree(d_P);
 }
 
