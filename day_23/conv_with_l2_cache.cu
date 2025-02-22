@@ -1,19 +1,37 @@
-#include <cuda.h>
 #include <iostream>
+#include <cuda.h>
 #include <chrono>
 
 #include "../helpers/cuda_helpers.h"
 
+
 #define MAX_MASK_WIDTH 5
+#define TILE_SIZE 16
 __constant__ float M[MAX_MASK_WIDTH];
 
-__global__ void convolution_1D_basic_kernel(float *N, float *P, int Width){
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
+
+__global__ void convolution_1D_tiled_caching_kernel(float *N, float *P, int Mask_Width, int Width) {
+    int i = blockIdx.x*blockDim.x + threadIdx.x;
+
+    __shared__ float N_ds[TILE_SIZE]; // N_ds[5]
+    
+    N_ds[threadIdx.x] = N[i];
+
+    __syncthreads();
+
+    int This_tile_start_point = blockIdx.x * blockDim.x;
+    int Next_tile_start_point = (blockIdx.x + 1) * blockDim.x;
+    int N_start_point = i - (Mask_Width/2);
     float Pvalue = 0;
-    int N_start_point = i - (MAX_MASK_WIDTH/2);
-    for (int j = 0; j < MAX_MASK_WIDTH; j++){
-        if (N_start_point + j >= 0 && N_start_point + j < Width){
-            Pvalue += N[N_start_point + j] * M[j];
+    for (int j = 0; j < Mask_Width; j++){
+        int N_index = N_start_point + j;
+        if (N_index >= 0 && N_index < Width){
+            if (N_index >= This_tile_start_point && N_index < Next_tile_start_point){
+                Pvalue += N_ds[threadIdx.x + j - (Mask_Width/2)] * M[j];
+            }
+            else{
+                Pvalue += N[N_index] * M[j];
+            }
         }
     }
     P[i] = Pvalue;
@@ -40,7 +58,7 @@ void test_convolution_1D_basic_kernel() {
     int numBlocks = (Width + blockSize - 1) / blockSize;
 
     auto start = std::chrono::high_resolution_clock::now();
-    convolution_1D_basic_kernel<<<numBlocks, blockSize>>>(d_N, d_P, Width);
+    convolution_1D_tiled_caching_kernel<<<numBlocks, blockSize>>>(d_N, d_P, MAX_MASK_WIDTH, Width);
     cudaDeviceSynchronize();
     auto end = std::chrono::high_resolution_clock::now();
 
