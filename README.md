@@ -96,3 +96,12 @@
 - Read section 7.3
 - Implement 1D convolution kernel with usage of constant memory. (Optimised on speed around 4 times)
 
+### **Day 21**
+- Implement `convolution_1D_tiled_kernel`
+
+### **Day 22**
+- Read Section 7.4 of PMPP book.
+
+### **Day 23**
+- Read Section 7.5 of PMPP.
+- Implement with simplified kernel for convolution with hope that L2 cache will be used by gpu
