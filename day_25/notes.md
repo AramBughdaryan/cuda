@@ -1,0 +1,8 @@
+**Parallel prefix sum (scan)** is a key pattern in parallel computing used to convert sequential operations into parallel ones. It is widely applicable in tasks like resource allocation, work assignment, and polynomial evaluation. Parallel scan is crucial for improving performance in massively parallel systems, as it helps eliminate sequential bottlenecks. However, designing work-efficient parallel scan algorithms is challenging, as even a slight increase in complexity can make them slower than their sequential counterparts for large datasets.
+
+### Key Points:
+1. **Inclusive Scan**: Takes a binary associative operator (e.g., addition) and an input array, returning an output array where each element is the cumulative result of the operation up to that point. For example, with addition, the input `[3, 1, 7, 0, 4, 1, 6, 3]` yields `[3, 4, 11, 11, 15, 16, 22, 25]`.
+2. **Exclusive Scan**: Similar to inclusive scan but starts with 0 and excludes the current element in the cumulative result. For the same input, the output would be `[0, 3, 4, 11, 11, 15, 16, 22]`.
+3. **Applications**: Parallel scan is used in tasks like memory allocation, sorting algorithms (e.g., radix sort, quick sort), polynomial evaluation, and stream compaction.
+4. **Work Efficiency**: Sequential scan algorithms are highly efficient, making it difficult for parallel algorithms to outperform them for large datasets unless they are equally work-efficient.
+5. **Example**: The sausage-cutting analogy illustrates how inclusive scan can determine cut points for parallel processing, enabling simultaneous execution of tasks.
