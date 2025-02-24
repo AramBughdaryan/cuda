@@ -106,3 +106,6 @@
 - Read Section 7.5 of PMPP.
 - Implement with simplified kernel for convolution with hope that L2 cache will be used by gpu
 
+### **Day 24**
+- Finish chapter 7 of PMPP.
+- Implement 2D convolution.
