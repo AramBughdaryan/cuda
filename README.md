@@ -109,3 +109,6 @@
 ### **Day 24**
 - Finish chapter 7 of PMPP.
 - Implement 2D convolution.
+
+### **Day 25**
+- Read Section 8.1 of PMPP
