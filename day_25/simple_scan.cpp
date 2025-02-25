@@ -5,8 +5,8 @@ void sequential_scan(float *x, float *y, int Max_i) {
     int accumulator = x[0];
     y[0] = accumulator;
     for (int i = 1; i < Max_i; i++) {
-    accumulator += x[i];
-    y[i] = accumulator;
+        accumulator += x[i];
+        y[i] = accumulator;
     }
 }
 

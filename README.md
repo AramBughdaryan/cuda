@@ -112,3 +112,7 @@
 
 ### **Day 25**
 - Read Section 8.1 of PMPP
+
+### **Day 26**
+- Read Section 8.2 of PMPP
+- Implement Kogge Stone scan kernel
