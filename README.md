@@ -117,6 +117,8 @@
 - Read Section 8.2 of PMPP
 - Implement Kogge Stone scan kernel
 
-### **Day 27**
-- Start to look at Deepseek's codes (https://github.com/deepseek-ai/DeepGEMM)
-- Start implementing matrix multiplication with triton
+### **Day 27** 
+- Start matmul implementation on triton
+
+### **Day 28** 
+- Benchmarked implementation of matmul with triton!
