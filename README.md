@@ -122,3 +122,7 @@
 
 ### **Day 28** 
 - Benchmarked implementation of matmul with triton!
+
+### **Day 29**
+- Start implementing Brent-Kung scan kernel.
+- Read first part of section 8.4
