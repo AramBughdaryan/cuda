@@ -126,3 +126,6 @@
 ### **Day 29**
 - Implement Brent-Kung scan kernel.
 - Read section 8.4.
+
+### **Day 30**
+- Read section 8.5.
