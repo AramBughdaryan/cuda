@@ -129,3 +129,6 @@
 
 ### **Day 30**
 - Read section 8.5.
+
+### **Day 30**
+- Start reading section 8.6.
