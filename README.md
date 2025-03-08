@@ -135,3 +135,6 @@
 
 ### **Day 31**
 - Start reading section 8.7
+
+### **Day 32**
+- Finish chapter 8
