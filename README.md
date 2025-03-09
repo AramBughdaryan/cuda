@@ -138,3 +138,7 @@
 
 ### **Day 32**
 - Finish chapter 8
+
+### **Day 33**
+- Start solving exercises (1/10)
+- Read intro of Chapter 9
