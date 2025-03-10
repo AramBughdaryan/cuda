@@ -142,3 +142,6 @@
 ### **Day 33**
 - Start solving exercises (1/10)
 - Read intro of Chapter 9
+
+### **Day 34**
+- Performed analysis of Brent-Kung and Kogge-Stone scan algorithms
