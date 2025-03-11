@@ -6,7 +6,8 @@
 __global__ void Brent_Kung_scan_kernel(float *X, float *Y, int InputSize) {
     __shared__ float XY[SECTION_SIZE];
     int i = 2 * blockIdx.x * blockDim.x + threadIdx.x;
-    if (i < InputSize) XY[threadIdx.x] = X[i];
+    if (i < InputSize) XY[threadIdx.x] = X[i]
+
     if (i + blockDim.x < InputSize) XY[threadIdx.x + blockDim.x] = X[i + blockDim.x];
 
     for (unsigned int stride = 1; stride < blockDim.x; stride *= 2) {

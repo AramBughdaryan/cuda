@@ -145,3 +145,6 @@
 
 ### **Day 34**
 - Performed analysis of Brent-Kung and Kogge-Stone scan algorithms
+
+### **Day 35**
+- Implemented hierarchical parralel scan with some bug (need to resolve)
