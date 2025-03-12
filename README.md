@@ -148,3 +148,6 @@
 
 ### **Day 35**
 - Implemented hierarchical parralel scan with some bug (need to resolve)
+
+### **Day 36**
+- Read section 9.1
