@@ -151,3 +151,6 @@
 
 ### **Day 36**
 - Read section 9.1
+
+### **Day 37**
+- Read section 9.2
