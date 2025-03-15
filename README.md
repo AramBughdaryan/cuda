@@ -154,3 +154,7 @@
 
 ### **Day 37**
 - Read section 9.2
+
+### **Day 38**
+- Read section 9.3
+
