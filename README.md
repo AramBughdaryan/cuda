@@ -157,4 +157,8 @@
 
 ### **Day 38**
 - Read section 9.3
+- Implement histogram calculation with **block** partitioning
+
+### **Day 39**
+- Implement histogram calculation with **interleaved** partitioning
 
