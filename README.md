@@ -162,3 +162,5 @@
 ### **Day 39**
 - Implement histogram calculation with **interleaved** partitioning
 
+### **Day 40**
+- Read section 9.4

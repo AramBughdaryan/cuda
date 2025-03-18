@@ -1,0 +1,11 @@
+While essential for ensuring the correctness of concurrent updates (by serializing accesses to shared locations), can severely limit performance in massively parallel programs. Here are the key points:
+	•	Atomic Operations and Serialization:
+Atomic operations prevent race conditions by serializing updates to a memory location. However, this serialization means that even on highly parallel architectures, only one update to a location can occur at a time.
+	•	Memory Access and Throughput Constraints:
+Modern GPUs are designed to hide memory access latency by overlapping many DRAM accesses. But when many threads perform atomic operations on the same location, the benefits of parallel DRAM access are lost. Each atomic operation involves a read-modify-write sequence that typically takes hundreds of clock cycles (e.g., 200 cycles for the read and 200 cycles for the write), limiting the overall throughput.
+	•	Throughput Analysis Example:
+The text provides a concrete example with a DRAM system showing that while the peak memory throughput might be very high (e.g., 128 GB/s), the throughput for atomic operations can be as low as 2.5 million operations per second when they are serialized. Even if operations are distributed over multiple memory locations (like the seven intervals of a histogram), contention and bias in data distribution (non-uniform character frequencies) reduce the effective throughput.
+	•	Impact on Kernel Performance:
+For CUDA kernels that rely on atomic operations (such as those used in parallel histogram computations), this limited atomic throughput significantly reduces the overall arithmetic operation throughput. The example provided shows that even with a boost from distributing the load, the effective performance is only a fraction of what modern GPUs can achieve, motivating the need for optimization strategies in parallel computations.
+
+Overall, the chapter highlights the trade-off between ensuring correctness with atomic operations and maintaining high performance on parallel architectures, stressing the importance of minimizing serialized operations to fully exploit GPU capabilities.
