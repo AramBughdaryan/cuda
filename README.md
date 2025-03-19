@@ -164,3 +164,8 @@
 
 ### **Day 40**
 - Read section 9.4
+
+### **Day 41**
+- Read section 9.5-9.6
+- Implement histogram computation kernel with privatized memory
+
