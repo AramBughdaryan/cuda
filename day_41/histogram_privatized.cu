@@ -14,7 +14,7 @@ __global__ void histogram_privatized_kernel(usigned char* input, usinged int* bi
     __syncthreads();
 
     for (unsigned int i = tid; i < num_elements; i += blockDim.x * gridDim.x) {
-        int alphabet_position = buffer[i] - 'a';
+        int alphabet_position = input[i] - 'a';
         if (alphabet_position >= 0 && alphabet_position < 26) {
             atomicAdd(&histo_s[alphabet_position/4], 1);
         }
