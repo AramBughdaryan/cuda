@@ -173,3 +173,5 @@
 - Finish chapter 9!
 - Implement histogram computation kernel with privatized memory and aggregation for large concentration values
 
+### **Day 43**
+- IStart implementation of **Linear** layer
