@@ -2,6 +2,37 @@
 #include <cuda.h>
 #include <torch/extension.h>
 
+__global__ void tiledMatrixMulKernel(float* d_M, float* d_N, float* d_P, int Width){
+    __shared__ float Mds[TILE_WIDTH][TILE_WIDTH];
+    __shared__ float Nds[TILE_WIDTH][TILE_WIDTH];
+
+    int bx = blockIdx.x;
+    int by = blockIdx.y;
+    int tx = threadIdx.x;
+    int ty = threadIdx.y;
+
+    // Saved as automatic variables thus in registers. 
+    int Row = by * TILE_WIDTH + ty;
+    int Col = bx * TILE_WIDTH + tx;
+
+    // As we declare this variable as automatic it will be private for each thread!
+    float Pvalue = 0;
+    for (int phase = 0; phase < Width / TILE_WIDTH; ++phase){
+        // Collaborative loading of d_M and d_N tiles into shared memory
+        Mds[ty][tx] = d_M[Row * Width + phase * TILE_WIDTH + tx];
+        Nds[ty][tx] = d_N[(phase * TILE_WIDTH + threadIdx.y) * Width + Col]; 
+        __syncthreads();
+
+        for (int k =0; k < TILE_WIDTH; ++k){
+            Pvalue += Mds[ty][k] * Nds[k][tx];
+        }
+        __syncthreads();
+    }
+    d_P[Row * Width + Col] = Pvalue;
+}
+
+
+
 class LinearFunction : public torch::autograd::Function<LinearFunction> {
 public:
     static at::Tensor forward(
