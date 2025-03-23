@@ -1,36 +1,7 @@
 #include <iostream>
 #include <cuda.h>
 #include <torch/extension.h>
-
-__global__ void tiledMatrixMulKernel(float* d_M, float* d_N, float* d_P, int Width){
-    __shared__ float Mds[TILE_WIDTH][TILE_WIDTH];
-    __shared__ float Nds[TILE_WIDTH][TILE_WIDTH];
-
-    int bx = blockIdx.x;
-    int by = blockIdx.y;
-    int tx = threadIdx.x;
-    int ty = threadIdx.y;
-
-    // Saved as automatic variables thus in registers. 
-    int Row = by * TILE_WIDTH + ty;
-    int Col = bx * TILE_WIDTH + tx;
-
-    // As we declare this variable as automatic it will be private for each thread!
-    float Pvalue = 0;
-    for (int phase = 0; phase < Width / TILE_WIDTH; ++phase){
-        // Collaborative loading of d_M and d_N tiles into shared memory
-        Mds[ty][tx] = d_M[Row * Width + phase * TILE_WIDTH + tx];
-        Nds[ty][tx] = d_N[(phase * TILE_WIDTH + threadIdx.y) * Width + Col]; 
-        __syncthreads();
-
-        for (int k =0; k < TILE_WIDTH; ++k){
-            Pvalue += Mds[ty][k] * Nds[k][tx];
-        }
-        __syncthreads();
-    }
-    d_P[Row * Width + Col] = Pvalue;
-}
-
+#include <cublas_v2.h>
 
 
 class LinearFunction : public torch::autograd::Function<LinearFunction> {
@@ -41,12 +12,40 @@ public:
         const at::Tensor& weight,
         const at::Tensor& bias
     ) {
+        int batch_size = input.size(0);
+        int in_features = input.size(1);
+        int out_features = weight.size(0);
+
+        auto output = torch::empty({batch_size, out_features}, input.options());
+
+        const float* input_ptr = input.data_ptr<float>();
+        const float* weight_ptr = weight.data_ptr<float>();
+        const float* output_ptr = output.data_ptr<float>();
+
         ctx->save_for_backward({input, weight, bias});
+
+        cublasHandle_t handle;
+        cublasCreate(&handle);
+
+        float alpha = 1.0f;
+        float beta = 0.0f;
+
+        cublasSgemm(
+            handle, CUBLAS_OP_N, CUBLAS_OP_T, batch_size,
+            out_features, in_features, &alpha, input_ptr, batch_size, weight_ptr, out_features,
+            &beta, output_ptr, batch_size
+        )
+
+        if (bias.defined()) {
+            output.add_(bias);
+        }
+
         // This part must be moved into cuda and either use cuBLAS or custom implementation
         auto output = torch::matmul(input, weight.t());
         if (bias.defined()) {
             output.add_(bias);
         }
+        cudaDestroy(handle);
         return output;
     }
 
