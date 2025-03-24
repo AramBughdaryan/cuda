@@ -174,4 +174,7 @@
 - Implement histogram computation kernel with privatized memory and aggregation for large concentration values
 
 ### **Day 43**
-- IStart implementation of **Linear** layer
+- Start implementation of **Linear** layer
+
+### **Day 44**
+- Add cublas usage to my Linear layer which still does not work
