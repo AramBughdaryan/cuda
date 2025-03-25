@@ -2,6 +2,7 @@
 #include <cuda.h>
 #include <torch/extension.h>
 #include <cublas_v2.h>
+#include <ATen/ATen.h>
 
 
 class LinearFunction : public torch::autograd::Function<LinearFunction> {
@@ -33,11 +34,14 @@ public:
         float alpha = 1.0f;
         float beta = 0.0f;
 
+        // alpha * x * w^T 
         status = cublasSgemm(
             handle, CUBLAS_OP_N, CUBLAS_OP_T,
             batch_size, out_features, in_features,
-            &alpha, input_ptr, batch_size,
-            weight_ptr, out_features, &beta,
+            &alpha,
+            input_ptr, batch_size,
+            weight_ptr, out_features,
+            &beta,
             output_ptr, batch_size
         );
         if (status != CUBLAS_STATUS_SUCCESS) {
@@ -49,7 +53,6 @@ public:
             output.add_(bias);
         }
 
-        // This part must be moved into cuda and either use cuBLAS or custom implementation
         cublasDestroy(handle);
         return output;
     }
@@ -133,8 +136,8 @@ public:
 
 class LinearLayer: public torch::nn::Module {
 private:
-    torch::Tensor weight;
-    torch::Tensor bias;
+    at::Tensor weight;
+    at::Tensor bias;
     int in_features;
     int out_features;
 
@@ -159,17 +162,16 @@ public:
         }
     }
 
-    torch::Tensor forward(const torch::Tensor& input) {
+    at::Tensor forward(const at::Tensor& input) {
         return LinearFunction::apply(input, weight, bias);
     }
 
 };
 
 int main() {
-    // Your test code here.
-    torch::Tensor input = torch::randn({2, 3}); // Example input
-    LinearLayer layer(3, 4);
-    torch::Tensor output = layer.forward(input);
+    at::Tensor input = torch::randn({128, 32});
+    LinearLayer layer(32, 4);
+    at::Tensor output = layer.forward(input);
     std::cout << output << std::endl;
     return 0;
 }

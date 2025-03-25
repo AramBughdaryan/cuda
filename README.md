@@ -178,3 +178,7 @@
 
 ### **Day 44**
 - Add cublas usage to my Linear layer which still does not work
+
+### **Day 45**
+- Fix Linear building
+- Start implementing activation functions in cuda
