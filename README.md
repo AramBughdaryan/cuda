@@ -181,4 +181,9 @@
 
 ### **Day 45**
 - Fix Linear building
-- Start implementing activation functions in cuda
+- Implement ReLU activation and benchmarked with PyTorch's ReLU
+
+### **Day 46**
+- Read section 12.1, 12.2 (PMPP 4th Edition )
+- Implement sequential merge
+
