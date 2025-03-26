@@ -1,108 +1,100 @@
 #include <iostream>
 #include <cuda.h>
 #include <torch/extension.h>
-#include <cublas_v2.h>
 #include <ATen/ATen.h>
 
-__global__ void ReLUKernel(float* input, float* output, int size) {
+// Global CUDA kernel for forward pass ReLU
+__global__ void ReLUKernel(const float* input, float* output, int size) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < size) {
-        output[idx] = max(0.0f, input[idx]);
+        output[idx] = fmaxf(0.0f, input[idx]); // Use fmaxf for better performance
     }
 }
 
+// Global CUDA kernel for backward pass ReLU
 __global__ void ReLUBackwardKernel(
-    float* gradOutput, 
-    float* input, 
+    const float* gradOutput, 
+    const float* input, 
     float* gradInput, 
     int size
 ) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < size) {
         // Gradient is 1 if input > 0, 0 otherwise
-        gradInput[idx] = input[idx] > 0 ? gradOutput[idx] : 0.0f;
+        gradInput[idx] = (input[idx] > 0) ? gradOutput[idx] : 0.0f;
     }
 }
-
-__global__ void leakyReluKernel(float* input, float* output, int size, float alpha) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx < size) {
-        output[idx] = input[idx] > 0 ? input[idx] : alpha * input[idx];
-    }
-}
-
-__global__ void leakyReluBackwardKernel(
-    float* gradOutput, 
-    float* input, 
-    float* gradInput, 
-    int size, 
-    float alpha
-) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx < size) {
-        // Gradient is 1 if input > 0, alpha otherwise
-        gradInput[idx] = input[idx] > 0 ? gradOutput[idx] : alpha * gradOutput[idx];
-    }
-}
-
-__global__ void sigmoidKernel(float* input, float* output, int size) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx < size) {
-        output[idx] = 1.0f / (1.0f + expf(-input[idx]));
-    }
-}
-
-__global__ void sigmoidBackwardKernel(
-    float* gradOutput, 
-    float* output, 
-    float* gradInput, 
-    int size
-) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx < size) {
-        // Derivative of sigmoid: output * (1 - output)
-        gradInput[idx] = gradOutput[idx] * output[idx] * (1.0f - output[idx]);
-    }
-}
-
 
 class ReLU : public torch::autograd::Function<ReLU> {
 public:
-    static at::Tensor forward(
+    static torch::Tensor forward(
         torch::autograd::AutogradContext* ctx,
-        const at::Tensor& input,
+        const torch::Tensor& input
     ) {
-    int batch_size = input.size(0);
-    int length = input.size(1);
-    auto output = torch::empty({batch_size, out_features}, input.options());
+        // Ensure input is contiguous and on CUDA
+        TORCH_CHECK(input.is_cuda(), "Input tensor must be a CUDA tensor");
+        
+        int batch_size = input.size(0);
+        int length = input.numel(); // Use numel() instead of size(1)
+        
+        // Create output tensor with same options as input
+        auto output = torch::empty_like(input);
+        
+        // Compute grid and block dimensions
+        const int blockSize = 256;
+        const int numBlocks = (length + blockSize - 1) / blockSize;
+        
+        // Launch CUDA kernel
 
-    float* input_ptr = input.data_ptr<float>();
-    float* output_ptr = output.data_ptr<float>();
-    ctx->save_for_backward({input});
-    int blockSize = 256;
-    int numBlocks = (length + blockSize - 1) / blockSize;
-    ReLUKernel<<<numBlocks, blockSize>>>(input, output, length);
+        ReLUKernel<<<numBlocks, blockSize>>>(
+            input.data_ptr<float>(), 
+            output.data_ptr<float>(), 
+            length
+        );
 
-    return output;
+        
+        // Save input for backward pass
+        ctx->save_for_backward({input});
+        
+        return output;
     }
 
-    static std::vector<at::Tensor> backward(
+    static std::vector<torch::Tensor> backward(
         torch::autograd::AutogradContext* ctx,
-        std::vector<at::Tensor> grad_outputs
+        std::vector<torch::Tensor> grad_outputs
     ) {
+        // Retrieve saved input
         auto saved = ctx->get_saved_variables();
         auto input = saved[0];
-
-        int blockSize = 256;
-        int numBlocks = (length + blockSize - 1) / blockSize;
-
-        // declare gradInput and pass to backward kernel
-
-        ReLUBackwardKernel<<<numBlocks, blockSize>>>(grad_outputs, input);
-
         
-
+        // Ensure grad_output is contiguous
+        auto grad_output = grad_outputs[0].contiguous();
         
+        // Create gradient input tensor
+        auto grad_input = torch::empty_like(input);
+        
+        int length = input.numel(); // Use numel() 
+        const int blockSize = 256;
+        const int numBlocks = (length + blockSize - 1) / blockSize;
+        
+        // Launch CUDA kernel
+        
+        ReLUBackwardKernel<<<numBlocks, blockSize>>>(
+            grad_output.data_ptr<float>(),
+            input.data_ptr<float>(),
+            grad_input.data_ptr<float>(),
+            length
+        );
+        
+        return {grad_input};
     }
-
 };
+
+// Create a convenient function to register the custom autograd function to not export whole class
+torch::Tensor relu_custom(const torch::Tensor& input) {
+    return ReLU::apply(input);
+}
+
+PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+    m.def("relu_custom", &relu_custom, "Custom ReLU activation function");
+}
