@@ -187,3 +187,5 @@
 - Read section 12.1, 12.2 (PMPP 4th Edition )
 - Implement sequential merge
 
+### **Day 47**
+- Implement standard embeeding lookup kernel
