@@ -189,3 +189,14 @@
 
 ### **Day 47**
 - Implement standard embeeding lookup kernel
+
+### **Day 48**
+**Texture Embedding Lookup**
+- Implemented texture embedding lookup using `cudaArrays`.  
+  *Note: `cudaArrays` are read-only.*
+
+- **Standard Embedding Lookup Kernel vs. Texture Lookup:**  
+  Achieved a **1.25x speedup** with the following configuration:
+  - **Batch Size:** 1024
+  - **Vocabulary Size:** 10,000
+  - **Embedding Dimension:** 128
