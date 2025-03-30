@@ -48,8 +48,9 @@ def benchmark_embedding(vocab_size, embedding_dim, batch_size, num_runs=100):
     # Create embedding layers
     custom_embedding = cuda_embedding.CudaEmbedding(vocab_size, embedding_dim)
     pytorch_embedding = nn.Embedding(vocab_size, embedding_dim).cuda()
-    custom_embedding.set_weight(pytorch_embedding.weight.data) 
-    import pdb; pdb.set_trace()
+    # custom_embedding.set_weight(pytorch_embedding.weight.data) 
+
+    custom_embedding.weight.data.copy_(pytorch_embedding.weight.data)  # Ensure identical weights for fair comparison
     # Ensure identical weights for fair comparison
     
     grad_output = torch.randn(batch_size, embedding_dim, device="cuda")
@@ -77,8 +78,7 @@ def benchmark_embedding(vocab_size, embedding_dim, batch_size, num_runs=100):
     # Prepare for backward pass
     custom_embedding.zero_grad()
     pytorch_embedding.zero_grad()
-    
-    # Benchmark backward pass - Custom
+
     start_time = time.time()
     for _ in range(num_runs):
         out = custom_embedding.forward(indices.to(torch.int32))
@@ -87,7 +87,6 @@ def benchmark_embedding(vocab_size, embedding_dim, batch_size, num_runs=100):
         torch.cuda.synchronize()
     custom_backward_time = (time.time() - start_time) * 1000 / num_runs  # ms
     
-    # Save gradients for comparison
     custom_grads = custom_embedding.weight.grad.clone()
     custom_embedding.zero_grad()
     
@@ -141,7 +140,6 @@ def benchmark_embedding(vocab_size, embedding_dim, batch_size, num_runs=100):
 
 
 if __name__ == "__main__":
-    # Ensure CUDA is available
     if not torch.cuda.is_available():
         print("CUDA is not available. Exiting...")
         exit(1)
