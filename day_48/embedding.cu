@@ -21,7 +21,7 @@ const int NUM_ITERATIONS = 10;   // Benchmark iterations
 __global__ void embedding_lookup_kernel(
     float* output,           // Output embeddings
     const int* indices,      // Input indices to look up
-    const float* embedding_table, 
+    const float* embedding_table,
     int vocab_size,          // Total vocabulary size
     int embedding_dim,       // Dimension of each embedding
     int batch_size           // Number of indices to look up
