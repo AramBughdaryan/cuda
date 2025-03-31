@@ -200,3 +200,10 @@
   - **Batch Size:** 1024
   - **Vocabulary Size:** 10,000
   - **Embedding Dimension:** 128
+
+### **Day 49**
+- Implemented Embedding layer forward and backward
+- Benchmark with pytorch's c++ api
+
+### **Day 50**
+- Write wrapper for Embedding layer

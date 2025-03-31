@@ -1,0 +1,6 @@
+activations.cu
+setup.py
+my_activations.egg-info/PKG-INFO
+my_activations.egg-info/SOURCES.txt
+my_activations.egg-info/dependency_links.txt
+my_activations.egg-info/top_level.txt
