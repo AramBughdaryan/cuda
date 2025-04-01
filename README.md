@@ -207,3 +207,6 @@
 
 ### **Day 50**
 - Write wrapper for Embedding layer
+
+### **Day 51**
+- Understanding merge sort basics section 12.3
